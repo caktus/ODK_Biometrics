@@ -1,10 +1,11 @@
 # Start with a base image containing Java runtime
-FROM gradle:7.6.1-jdk17 AS builder
+FROM gradle:8.4.0-jdk17 AS builder
 
 # Build CLI tool
 WORKDIR /build/CLI
 COPY CLI /build/CLI
 RUN ./gradlew clean distZip
+# RUN gradle clean distZip
 
 # Final image
 FROM eclipse-temurin:17-jre
