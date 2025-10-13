@@ -26,12 +26,12 @@ class MatchCommand(
 
     override fun run() {
         val (templateOne, templateTwo) = if (plainText) {
-            Pair(templateOne.toByteArray(), templateTwo.toByteArray())
+            Pair(matcher.getTemplate(templateOne.toByteArray()), matcher.getTemplate(templateTwo.toByteArray()))
         } else {
-            Pair(readAndTrim(File(templateOne)), readAndTrim(File(templateTwo)))
+            Pair(matcher.getTemplate(readAndTrim(File(templateOne))), matcher.getTemplate(readAndTrim(File(templateTwo))))
         }
 
-        val score = matcher.match(templateOne, templateTwo)
+        val score = templateOne.match(templateTwo)
         if (matchWithScore) {
             if (isMatch(score)) {
                 logger.log("match_$score")
