@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
 
-class ParallelFoldTest {
+class ParallelFlatMapTest {
 
     @Test
     fun `creates a set from the sets returned from the operation`() {
