@@ -11,12 +11,12 @@ class ParallelFoldTest {
         val sequence = sequenceOf(1, 2, 3, 4)
         val evens = sequence.parallelFlatMap {
             if (it % 2 == 0) {
-                setOf(it)
+                listOf(it)
             } else {
-                emptySet()
+                emptyList()
             }
         }
 
-        assertThat(evens, equalTo(setOf(2, 4)))
+        assertThat(evens, equalTo(listOf(2, 4)))
     }
 }

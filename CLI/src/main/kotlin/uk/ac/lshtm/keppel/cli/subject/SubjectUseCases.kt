@@ -27,11 +27,11 @@ object SubjectUseCases {
                 }
 
                 if (scores.any { it >= threshold }) {
-                    setOf(Match(pair.first.id, pair.second.id, scores))
+                    listOf(Match(pair.first.id, pair.second.id, scores))
                 } else {
-                    emptySet()
+                    emptyList()
                 }
-            }.toList()
+            }
     }
 
     data class Match(val id1: String, val id2: String, val scores: List<Double>)
