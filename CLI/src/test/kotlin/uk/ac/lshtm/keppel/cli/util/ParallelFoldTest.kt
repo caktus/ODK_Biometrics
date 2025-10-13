@@ -9,7 +9,7 @@ class ParallelFoldTest {
     @Test
     fun `creates a set from the sets returned from the operation`() {
         val sequence = sequenceOf(1, 2, 3, 4)
-        val evens = sequence.parallelFold {
+        val evens = sequence.parallelFlatMap {
             if (it % 2 == 0) {
                 setOf(it)
             } else {

@@ -2,7 +2,7 @@ package uk.ac.lshtm.keppel.cli.subject
 
 import uk.ac.lshtm.keppel.cli.Template
 import uk.ac.lshtm.keppel.cli.TemplateFactory
-import uk.ac.lshtm.keppel.cli.util.parallelFold
+import uk.ac.lshtm.keppel.cli.util.parallelFlatMap
 import uk.ac.lshtm.keppel.cli.util.uniquePairs
 
 object SubjectUseCases {
@@ -21,7 +21,7 @@ object SubjectUseCases {
                 )
             }
             .uniquePairs()
-            .parallelFold(parallelism ?: 2) { pair ->
+            .parallelFlatMap(parallelism ?: 2) { pair ->
                 val scores = pair.first.templates.zip(pair.second.templates).map { (one, two) ->
                     one.match(two)
                 }
