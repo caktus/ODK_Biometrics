@@ -5,7 +5,7 @@ import com.machinezoo.sourceafis.FingerprintMatcher
 import com.machinezoo.sourceafis.FingerprintTemplate
 import org.apache.commons.codec.binary.Hex
 
-class SourceAFISMatcher : Matcher {
+class SourceAFISTemplateFactory : TemplateFactory {
     override fun getTemplate(bytes: ByteArray): Template {
         return SourceAFISTemplate(bytes)
     }

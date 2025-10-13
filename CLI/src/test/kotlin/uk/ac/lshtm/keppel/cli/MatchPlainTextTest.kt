@@ -5,12 +5,12 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import uk.ac.lshtm.keppel.cli.support.FakeLogger
-import uk.ac.lshtm.keppel.cli.support.FakeMatcher
+import uk.ac.lshtm.keppel.cli.support.FakeTemplateFactory
 
 class MatchPlainTextTest {
 
     private val logger = FakeLogger()
-    private val matcher = FakeMatcher()
+    private val matcher = FakeTemplateFactory()
 
     @Test
     fun logsScore() {

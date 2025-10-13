@@ -4,7 +4,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
 import uk.ac.lshtm.keppel.cli.support.FakeLogger
-import uk.ac.lshtm.keppel.cli.support.FakeMatcher
+import uk.ac.lshtm.keppel.cli.support.FakeTemplateFactory
 import uk.ac.lshtm.keppel.cli.support.toHexString
 import java.io.File
 import kotlin.io.path.createTempDirectory
@@ -15,7 +15,7 @@ import kotlin.io.path.writeText
 class PMatchCommandTest {
 
     private val logger = FakeLogger()
-    private val matcher = FakeMatcher()
+    private val matcher = FakeTemplateFactory()
 
     @Test
     fun `writes output CSV with matched ids`() {

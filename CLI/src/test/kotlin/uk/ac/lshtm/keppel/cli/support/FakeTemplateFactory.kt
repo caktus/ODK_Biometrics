@@ -1,10 +1,10 @@
 package uk.ac.lshtm.keppel.cli.support
 
 import org.apache.commons.codec.binary.Hex
-import uk.ac.lshtm.keppel.cli.Matcher
 import uk.ac.lshtm.keppel.cli.Template
+import uk.ac.lshtm.keppel.cli.TemplateFactory
 
-class FakeMatcher : Matcher {
+class FakeTemplateFactory : TemplateFactory {
 
     private val scores = mutableListOf<Triple<String, String, Double>>()
     override fun getTemplate(bytes: ByteArray): Template {

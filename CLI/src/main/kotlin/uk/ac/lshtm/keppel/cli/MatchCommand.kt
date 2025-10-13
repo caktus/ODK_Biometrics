@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.types.double
 import java.io.File
 
 class MatchCommand(
-    private val matcher: Matcher,
+    private val templateFactory: TemplateFactory,
     private val defaultThreshold: Double,
     private val logger: Logger
 ) : CliktCommand(
@@ -26,9 +26,9 @@ class MatchCommand(
 
     override fun run() {
         val (templateOne, templateTwo) = if (plainText) {
-            Pair(matcher.getTemplate(templateOne.toByteArray()), matcher.getTemplate(templateTwo.toByteArray()))
+            Pair(templateFactory.getTemplate(templateOne.toByteArray()), templateFactory.getTemplate(templateTwo.toByteArray()))
         } else {
-            Pair(matcher.getTemplate(readAndTrim(File(templateOne))), matcher.getTemplate(readAndTrim(File(templateTwo))))
+            Pair(templateFactory.getTemplate(readAndTrim(File(templateOne))), templateFactory.getTemplate(readAndTrim(File(templateTwo))))
         }
 
         val score = templateOne.match(templateTwo)

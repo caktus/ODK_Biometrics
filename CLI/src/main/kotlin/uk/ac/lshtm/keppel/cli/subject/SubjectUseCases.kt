@@ -1,6 +1,6 @@
 package uk.ac.lshtm.keppel.cli.subject
 
-import uk.ac.lshtm.keppel.cli.Matcher
+import uk.ac.lshtm.keppel.cli.TemplateFactory
 import uk.ac.lshtm.keppel.cli.util.parallelFold
 import uk.ac.lshtm.keppel.cli.util.uniquePairs
 
@@ -8,13 +8,13 @@ object SubjectUseCases {
 
     fun findMatches(
         subjects: List<Subject>,
-        matcher: Matcher,
+        templateFactory: TemplateFactory,
         threshold: Double,
         parallelism: Int? = null
     ): List<Match> {
         return subjects
             .map { subject ->
-                Pair(subject.id, subject.templates.map { matcher.getTemplate(it.toByteArray()) })
+                Pair(subject.id, subject.templates.map { templateFactory.getTemplate(it.toByteArray()) })
             }
             .uniquePairs()
             .parallelFold(parallelism ?: 2) { pair ->

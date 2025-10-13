@@ -10,7 +10,7 @@ import uk.ac.lshtm.keppel.cli.subject.SubjectUseCases
 import java.io.File
 
 class PMatchCommand(
-    private val matcher: Matcher,
+    private val templateFactory: TemplateFactory,
     private val defaultThreshold: Double
 ) :
     CliktCommand(
@@ -30,7 +30,7 @@ class PMatchCommand(
             throw IllegalArgumentException(Strings.ERROR_PMATCH_NO_HEADER_ROW)
         }
 
-        val matches = SubjectUseCases.findMatches(subjects, matcher, threshold ?: defaultThreshold, parallelism)
+        val matches = SubjectUseCases.findMatches(subjects, templateFactory, threshold ?: defaultThreshold, parallelism)
 
         val outputCsv = File(outputCsvPath)
         outputCsv.printWriter().use { writer ->

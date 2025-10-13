@@ -3,14 +3,14 @@ package uk.ac.lshtm.keppel.cli.subject
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
-import uk.ac.lshtm.keppel.cli.support.FakeMatcher
+import uk.ac.lshtm.keppel.cli.support.FakeTemplateFactory
 import uk.ac.lshtm.keppel.cli.support.toHexString
 
 class SubjectUseCasesFindMatchTest {
 
     @Test
     fun `counts scores equal to threshold as matches`() {
-        val matcher = FakeMatcher()
+        val matcher = FakeTemplateFactory()
         val subjects = listOf(
             Subject("1", listOf("thumb1".toHexString())),
             Subject("2", listOf("thumb2".toHexString()))

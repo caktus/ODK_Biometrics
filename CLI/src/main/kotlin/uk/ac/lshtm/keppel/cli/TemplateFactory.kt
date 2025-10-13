@@ -1,6 +1,6 @@
 package uk.ac.lshtm.keppel.cli
 
-interface Matcher {
+interface TemplateFactory {
 
     fun getTemplate(bytes: ByteArray): Template
 }
