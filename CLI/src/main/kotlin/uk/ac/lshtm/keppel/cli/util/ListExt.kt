@@ -14,8 +14,8 @@ fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     }
 }
 
-fun <T, U> Sequence<T>.parallelFlatMap(parallelism: Int = 2, operation: (T) -> List<U>): Iterable<U> {
-    return ParallelFlatMapSequenceCursor(parallelism, parallelism, this, operation)
+fun <T, U> Sequence<T>.parallelFlatMap(parallelism: Int = 2, windowSize: Int = 100, operation: (T) -> List<U>): Iterable<U> {
+    return ParallelFlatMapSequenceCursor(parallelism, windowSize, this, operation)
 }
 
 private class ParallelFlatMapSequenceCursor<T, U>(
@@ -50,7 +50,7 @@ private class ParallelFlatMapSequenceCursor<T, U>(
             }
 
             override fun hasNext(): Boolean {
-                return chunkIterator.hasNext()
+                return currentList.hasNext() || currentWindow.hasNext() || chunkIterator.hasNext()
             }
         }
     }
