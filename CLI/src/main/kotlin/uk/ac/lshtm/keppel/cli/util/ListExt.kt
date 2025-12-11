@@ -1,6 +1,7 @@
 package uk.ac.lshtm.keppel.cli.util
 
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 
 fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     val list = this
@@ -13,19 +14,44 @@ fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     }
 }
 
-fun <T, U> Sequence<T>.parallelFlatMap(threads: Int = 2, operation: (T) -> List<U>): Iterable<U> {
-    val workerPool = Executors.newFixedThreadPool(threads)
-    val futures = this.map { item ->
-        workerPool.submit<List<U>> {
-            operation(item)
+fun <T, U> Sequence<T>.parallelFlatMap(parallelism: Int = 2, operation: (T) -> List<U>): Iterable<U> {
+    return ParallelFlatMapSequenceCursor(parallelism, parallelism, this, operation)
+}
+
+private class ParallelFlatMapSequenceCursor<T, U>(
+    private val windowSize: Int,
+    private val parallelism: Int,
+    private val sequence: Sequence<T>,
+    private val operation: (T) -> List<U>
+) : Iterable<U> {
+
+    override fun iterator(): Iterator<U> {
+        return object : Iterator<U> {
+
+            private val workerPool = Executors.newFixedThreadPool(parallelism)
+            private val chunkIterator = sequence.chunked(windowSize).iterator()
+            private var currentWindow: Iterator<Future<List<U>>> = emptyList<Future<List<U>>>().iterator()
+            private var currentList: Iterator<U> = emptyList<U>().iterator()
+
+            override fun next(): U {
+                while (!currentList.hasNext()) {
+                    if (!currentWindow.hasNext()) {
+                        val futures = chunkIterator.next().map {
+                            workerPool.submit<List<U>> { operation(it) }
+                        }
+
+                        currentWindow = futures.iterator()
+                    }
+
+                    currentList = currentWindow.next().get().iterator()
+                }
+
+                return currentList.next()
+            }
+
+            override fun hasNext(): Boolean {
+                return chunkIterator.hasNext()
+            }
         }
     }
-
-    val set = futures.fold(emptyList<U>()) { accum, future ->
-        accum + future.get()
-    }
-
-    workerPool.shutdown()
-    workerPool.awaitTermination(30L, java.util.concurrent.TimeUnit.SECONDS)
-    return set
 }
