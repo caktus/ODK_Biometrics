@@ -13,7 +13,7 @@ fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     }
 }
 
-fun <T, U> Sequence<T>.parallelFlatMap(threads: Int = 2, operation: (T) -> List<U>): List<U> {
+fun <T, U> Sequence<T>.parallelFlatMap(threads: Int = 2, operation: (T) -> List<U>): Iterable<U> {
     val workerPool = Executors.newFixedThreadPool(threads)
     val futures = this.map { item ->
         workerPool.submit<List<U>> {

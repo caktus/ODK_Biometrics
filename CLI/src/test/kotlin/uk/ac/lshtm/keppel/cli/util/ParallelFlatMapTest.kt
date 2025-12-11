@@ -17,6 +17,6 @@ class ParallelFlatMapTest {
             }
         }
 
-        assertThat(evens, equalTo(listOf(2, 4)))
+        assertThat(evens.toList(), equalTo(listOf(2, 4)))
     }
 }

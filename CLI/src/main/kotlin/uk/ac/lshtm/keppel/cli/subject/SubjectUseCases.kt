@@ -12,7 +12,7 @@ object SubjectUseCases {
         templateFactory: TemplateFactory,
         threshold: Double,
         parallelism: Int? = null
-    ): List<Match> {
+    ): Iterable<Match> {
         return subjects
             .map { subject ->
                 SubjectWithTemplates(

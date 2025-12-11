@@ -34,14 +34,14 @@ class PMatchCommand(
 
         val outputCsv = File(outputCsvPath)
         outputCsv.printWriter().use { writer ->
-            if (matches.isNotEmpty()) {
-                val header = "id_1, id_2, " + (1..matches[0].scores.size).joinToString(", ") { "score_$it" }
-                writer.println(header)
-
-                matches.forEach {
-                    val row = "${it.id1}, ${it.id2}, " + it.scores.joinToString(", ")
-                    writer.println(row)
+            matches.forEachIndexed { index, match ->
+                if (index == 0) {
+                    val header = "id_1, id_2, " + (1..match.scores.size).joinToString(", ") { "score_$it" }
+                    writer.println(header)
                 }
+
+                val row = "${match.id1}, ${match.id2}, " + match.scores.joinToString(", ")
+                writer.println(row)
             }
         }
     }

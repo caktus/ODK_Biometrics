@@ -19,6 +19,6 @@ class SubjectUseCasesFindMatchTest {
         matcher.addScore("thumb1", "thumb2", 10.0)
 
         val matches = SubjectUseCases.findMatches(subjects, matcher, 10.0)
-        assertThat(matches, equalTo(listOf(SubjectUseCases.Match("1", "2", listOf(10.0)))))
+        assertThat(matches.toList(), equalTo(listOf(SubjectUseCases.Match("1", "2", listOf(10.0)))))
     }
 }
