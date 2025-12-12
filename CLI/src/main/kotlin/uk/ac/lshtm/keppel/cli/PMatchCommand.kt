@@ -31,7 +31,7 @@ class PMatchCommand(
             throw IllegalArgumentException(Strings.ERROR_PMATCH_NO_HEADER_ROW)
         }
 
-        val matches = SubjectUseCases.findMatches(subjects, templateFactory, threshold ?: defaultThreshold, parallelism)
+        val matches = SubjectUseCases.findMatches(subjects, templateFactory, threshold ?: defaultThreshold, parallelism, windowSize)
 
         val outputCsv = File(outputCsvPath)
         outputCsv.printWriter().use { writer ->
