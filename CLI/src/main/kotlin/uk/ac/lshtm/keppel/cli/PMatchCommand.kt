@@ -22,6 +22,7 @@ class PMatchCommand(
     private val outputCsvPath by option("-o", help = Strings.OUTPUT_CSV_HELP).required()
     private val parallelism by option("-p", help = Strings.PARALLELISM_HELP).int()
     private val threshold by option("-t", help = Strings.THRESHOLD_HELP).double()
+    private val windowSize by option("-w").int()
 
     override fun run() {
         val subjects = try {

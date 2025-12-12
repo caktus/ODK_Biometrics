@@ -11,7 +11,8 @@ object SubjectUseCases {
         subjects: List<Subject>,
         templateFactory: TemplateFactory,
         threshold: Double,
-        parallelism: Int? = null
+        parallelism: Int? = null,
+        windowSize: Int? = null
     ): Iterable<Match> {
         return subjects
             .map { subject ->
@@ -21,7 +22,7 @@ object SubjectUseCases {
                 )
             }
             .uniquePairs()
-            .parallelFlatMap(parallelism ?: 2) { pair ->
+            .parallelFlatMap(parallelism, windowSize) { pair ->
                 val scores = pair.first.templates.zip(pair.second.templates).map { (one, two) ->
                     one.match(two)
                 }

@@ -15,11 +15,11 @@ fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
 }
 
 fun <T, U> Sequence<T>.parallelFlatMap(
-    parallelism: Int = 2,
-    windowSize: Int = 100,
+    parallelism: Int? = null,
+    windowSize: Int? = null,
     operation: (T) -> Iterable<U>
 ): Iterable<U> {
-    return ParallelFlatMapSequenceIterable(parallelism, windowSize, this, operation)
+    return ParallelFlatMapSequenceIterable(parallelism ?: 2, windowSize ?: 100, this, operation)
 }
 
 private class ParallelFlatMapSequenceIterable<T, U>(
