@@ -1,7 +1,7 @@
 package uk.ac.lshtm.keppel.cli.util
 
+import kotlinx.coroutines.*
 import java.util.concurrent.Executors
-import java.util.concurrent.Future
 
 fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     val list = this
@@ -14,44 +14,59 @@ fun <T> List<T>.uniquePairs(): Sequence<Pair<T, T>> {
     }
 }
 
-fun <T, U> Sequence<T>.parallelFlatMap(parallelism: Int = 2, windowSize: Int = 100, operation: (T) -> List<U>): Iterable<U> {
-    return ParallelFlatMapSequenceCursor(parallelism, windowSize, this, operation)
+fun <T, U> Sequence<T>.parallelFlatMap(
+    parallelism: Int = 2,
+    windowSize: Int = 100,
+    operation: (T) -> Iterable<U>
+): Iterable<U> {
+    return ParallelFlatMapSequenceIterable(parallelism, windowSize, this, operation)
 }
 
-private class ParallelFlatMapSequenceCursor<T, U>(
+private class ParallelFlatMapSequenceIterable<T, U>(
     private val windowSize: Int,
     private val parallelism: Int,
     private val sequence: Sequence<T>,
-    private val operation: (T) -> List<U>
+    private val operation: (T) -> Iterable<U>
 ) : Iterable<U> {
 
     override fun iterator(): Iterator<U> {
-        return object : Iterator<U> {
+        return ParallelFlatMapSequenceCursor(windowSize, parallelism, sequence, operation)
+    }
+}
 
-            private val workerPool = Executors.newFixedThreadPool(parallelism)
-            private val chunkIterator = sequence.chunked(windowSize).iterator()
-            private var currentWindow: Iterator<Future<List<U>>> = emptyList<Future<List<U>>>().iterator()
-            private var currentList: Iterator<U> = emptyList<U>().iterator()
+private class ParallelFlatMapSequenceCursor<T, U>(
+    windowSize: Int,
+    parallelism: Int,
+    sequence: Sequence<T>,
+    private val operation: (T) -> Iterable<U>
+) : Iterator<U> {
 
-            override fun next(): U {
-                while (!currentList.hasNext()) {
-                    if (!currentWindow.hasNext()) {
-                        val futures = chunkIterator.next().map {
-                            workerPool.submit<List<U>> { operation(it) }
-                        }
+    private val dispatcher = Executors.newFixedThreadPool(parallelism).asCoroutineDispatcher()
+    private val coroutineScope = CoroutineScope(dispatcher)
 
-                        currentWindow = futures.iterator()
-                    }
+    private val chunkIterator = sequence.chunked(windowSize).iterator()
+    private var currentWindow: Iterator<Deferred<Iterable<U>>> = emptyList<Deferred<Iterable<U>>>().iterator()
+    private var currentList: Iterator<U> = emptyList<U>().iterator()
 
-                    currentList = currentWindow.next().get().iterator()
+    override fun next(): U {
+        while (!currentList.hasNext()) {
+            if (!currentWindow.hasNext()) {
+                val futures = chunkIterator.next().map {
+                    coroutineScope.async { operation(it) }
                 }
 
-                return currentList.next()
+                currentWindow = futures.iterator()
             }
 
-            override fun hasNext(): Boolean {
-                return currentList.hasNext() || currentWindow.hasNext() || chunkIterator.hasNext()
+            currentList = runBlocking {
+                currentWindow.next().await().iterator()
             }
         }
+
+        return currentList.next()
+    }
+
+    override fun hasNext(): Boolean {
+        return currentList.hasNext() || currentWindow.hasNext() || chunkIterator.hasNext()
     }
 }
