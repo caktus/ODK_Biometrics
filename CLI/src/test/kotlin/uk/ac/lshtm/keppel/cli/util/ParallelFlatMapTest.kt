@@ -1,8 +1,11 @@
 package uk.ac.lshtm.keppel.cli.util
 
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.lessThan
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
+import kotlin.random.Random
+import kotlin.time.measureTime
 
 class ParallelFlatMapTest {
 
@@ -32,5 +35,24 @@ class ParallelFlatMapTest {
         val sequence = sequenceOf(1, 2, 3, 4)
         sequence.parallelFlatMap { listOf(it) }
         assertThat(sequence.parallelFlatMap(windowSize = 4) { listOf(it, it) }.count(), equalTo(8))
+    }
+
+    @Test
+    fun `beats sequential flatMap for 1k+ items with default parallelism and window size`() {
+        val list = generateSequence { Random.nextInt() }.take(1000).toList()
+        val operation: (Int) -> Iterable<Int> = {
+            Thread.sleep(1)
+            listOf(it)
+        }
+
+        val parallelTime = measureTime {
+            list.asSequence().parallelFlatMap(operation = operation).forEach { }
+        }
+
+        val sequentialTime = measureTime {
+            list.asSequence().flatMap(operation).forEach { }
+        }
+
+        assertThat(parallelTime.inWholeMilliseconds, lessThan(sequentialTime.inWholeMilliseconds))
     }
 }
