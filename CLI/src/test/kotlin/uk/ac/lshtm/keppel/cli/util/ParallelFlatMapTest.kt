@@ -4,6 +4,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.lessThan
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Test
+import kotlin.math.sqrt
 import kotlin.random.Random
 import kotlin.time.measureTime
 
@@ -38,7 +39,7 @@ class ParallelFlatMapTest {
     }
 
     @Test
-    fun `beats sequential flatMap for 1k+ items with default parallelism and window size`() {
+    fun `beats sequential flatMap for 1000+ 1 millisecond operations with default parallelism and window size`() {
         val list = generateSequence { Random.nextInt() }.take(1000).toList()
         val operation: (Int) -> Iterable<Int> = {
             Thread.sleep(1)
