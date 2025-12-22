@@ -5,17 +5,19 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import uk.ac.lshtm.keppel.cli.support.FakeLogger
-import uk.ac.lshtm.keppel.cli.support.FakeMatcher
+import uk.ac.lshtm.keppel.cli.support.FakeTemplateFactory
 
 class MatchPlainTextTest {
 
     private val logger = FakeLogger()
-    private val matcher = FakeMatcher()
+    private val matcher = FakeTemplateFactory()
 
     @Test
     fun logsScore() {
         val app = App(matcher, 10.0)
-        app.execute(listOf("match", "-p", Hex.encodeHexString("index".toByteArray()), Hex.encodeHexString("index_210".toByteArray())), logger)
+        matcher.addScore("index1", "index2", 210.0)
+
+        app.execute(listOf("match", "-p", Hex.encodeHexString("index1".toByteArray()), Hex.encodeHexString("index2".toByteArray())), logger)
         assertThat(logger.lines, equalTo(listOf("210.0")))
     }
 

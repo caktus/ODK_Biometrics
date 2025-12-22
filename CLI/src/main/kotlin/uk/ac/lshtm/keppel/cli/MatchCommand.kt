@@ -8,11 +8,13 @@ import com.github.ajalt.clikt.parameters.types.double
 import java.io.File
 
 class MatchCommand(
-        private val matcher: Matcher,
-        private val defaultThreshold: Double,
-        private val logger: Logger) : CliktCommand(
-        name = "match",
-        help = "Match two hex encoded ISO fingerprint templates. Threshold used for matching is $defaultThreshold.") {
+    private val templateFactory: TemplateFactory,
+    private val defaultThreshold: Double,
+    private val logger: Logger
+) : CliktCommand(
+    name = "match",
+    help = "Match two hex encoded ISO fingerprint templates. Threshold used for matching is $defaultThreshold."
+) {
 
     private val plainText by option("-p", help = Strings.PLAIN_TEXT_HELP).flag(default = false)
     private val matchWithScore by option("-ms", help = Strings.MATCH_WITH_SCORE_HELP).flag(default = false)
@@ -24,12 +26,12 @@ class MatchCommand(
 
     override fun run() {
         val (templateOne, templateTwo) = if (plainText) {
-            Pair(templateOne.toByteArray(), templateTwo.toByteArray())
+            Pair(templateFactory.getTemplate(templateOne.toByteArray()), templateFactory.getTemplate(templateTwo.toByteArray()))
         } else {
-            Pair(readAndTrim(File(templateOne)), readAndTrim(File(templateTwo)))
+            Pair(templateFactory.getTemplate(readAndTrim(File(templateOne))), templateFactory.getTemplate(readAndTrim(File(templateTwo))))
         }
 
-        val score = matcher.match(templateOne, templateTwo)
+        val score = templateOne.match(templateTwo)
         if (matchWithScore) {
             if (isMatch(score)) {
                 logger.log("match_$score")

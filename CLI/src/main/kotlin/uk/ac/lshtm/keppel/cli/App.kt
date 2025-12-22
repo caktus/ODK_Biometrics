@@ -5,10 +5,10 @@ import com.github.ajalt.clikt.core.PrintHelpMessage
 import com.github.ajalt.clikt.core.subcommands
 
 fun main(args: Array<String>) {
-    App(SourceAFISMatcher(), 40.0).execute(args.toList(), StdoutLogger())
+    App(SourceAFISTemplateFactory(), 40.0).execute(args.toList(), StdoutLogger())
 }
 
-class App(private val matcher: Matcher,
+class App(private val templateFactory: TemplateFactory,
           private val defaultThreshold: Double) {
     fun execute(args: List<String>, logger: Logger) {
         class Root : CliktCommand(name = "keppel") {
@@ -16,7 +16,10 @@ class App(private val matcher: Matcher,
         }
 
         try {
-            Root().subcommands(MatchCommand(matcher, defaultThreshold, logger)).parse(args)
+            Root().subcommands(
+                MatchCommand(templateFactory, defaultThreshold, logger),
+                PMatchCommand(templateFactory, defaultThreshold)
+            ).parse(args)
         } catch (e: PrintHelpMessage) {
             logger.log(e.command.getFormattedHelp())
         } catch (e: Exception) {

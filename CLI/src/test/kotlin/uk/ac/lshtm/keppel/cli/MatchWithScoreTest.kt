@@ -4,19 +4,20 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import uk.ac.lshtm.keppel.cli.support.FakeLogger
-import uk.ac.lshtm.keppel.cli.support.FakeMatcher
+import uk.ac.lshtm.keppel.cli.support.FakeTemplateFactory
 import uk.ac.lshtm.keppel.cli.support.toHexString
 
 
 class MatchWithScoreTest {
 
     private val logger = FakeLogger()
-    private val matcher = FakeMatcher()
+    private val matcher = FakeTemplateFactory()
 
     @Test
     fun whenMatchIsLessThanThreshold_logsScore() {
-        val fileOne = createTempFile().apply { writeText("index".toHexString()) }
-        val fileTwo = createTempFile().apply { writeText("index_9.0".toHexString()) }
+        val fileOne = createTempFile().apply { writeText("index1".toHexString()) }
+        val fileTwo = createTempFile().apply { writeText("index2".toHexString()) }
+        matcher.addScore("index1", "index2", 9.0)
 
         val app = App(matcher, 10.0)
         app.execute(listOf("match", "-ms", fileOne.absolutePath, fileTwo.absolutePath), logger)
@@ -24,9 +25,10 @@ class MatchWithScoreTest {
     }
 
     @Test
-    fun whenEqualToThreshold_logsNotAMatch() {
-        val fileOne = createTempFile().apply { writeText("index".toHexString()) }
-        val fileTwo = createTempFile().apply { writeText("index_10.0".toHexString()) }
+    fun whenEqualToThreshold_logsAMatch() {
+        val fileOne = createTempFile().apply { writeText("index1".toHexString()) }
+        val fileTwo = createTempFile().apply { writeText("index2".toHexString()) }
+        matcher.addScore("index1", "index2", 10.0)
 
         val app = App(matcher, 10.0)
         app.execute(listOf("match", "-ms", fileOne.absolutePath, fileTwo.absolutePath), logger)
@@ -34,9 +36,10 @@ class MatchWithScoreTest {
     }
 
     @Test
-    fun whenGreaterThanThreshold_logsNotAMatch() {
-        val fileOne = createTempFile().apply { writeText("index".toHexString()) }
-        val fileTwo = createTempFile().apply { writeText("index_11.0".toHexString()) }
+    fun whenGreaterThanThreshold_logsAMatch() {
+        val fileOne = createTempFile().apply { writeText("index1".toHexString()) }
+        val fileTwo = createTempFile().apply { writeText("index2".toHexString()) }
+        matcher.addScore("index1", "index2", 11.0)
 
         val app = App(matcher, 10.0)
         app.execute(listOf("match", "-ms", fileOne.absolutePath, fileTwo.absolutePath), logger)
